@@ -1,0 +1,57 @@
+version: "2"
+
+services:
+  nginx:
+    container_name: nginx
+    image: "nginx:${NGINX_TAG}"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "${NGINX_CONF}:/etc/nginx/conf.d/default.conf"
+      - "${NGINX_ROOT}:/usr/share/nginx/html"
+    networks:
+      - webstack
+    restart: always
+
+  node:
+    container_name: node
+    image: "node:${NODE_TAG}"
+    user: node
+    working_dir: /data
+    environment:
+      - "NODE_ENV=${NODE_ENV}"
+      - "PORT=${NODE_PORT}"
+    volumes:
+      - "${NODE_DATA}:/data"
+    command: ["yarn", "start"]
+    networks:
+      - webstack
+    restart: always
+
+  mongo:
+    container_name: mongo
+    image: "mongo:${MONGO_TAG}"
+    volumes:
+      - "${MONGO_DATA}:/data/db"
+    ports:
+      - "27017:27017"
+    networks:
+      - webstack
+    restart: always
+
+  redis:
+    container_name: redis
+    image: "redis:${REDIS_TAG}"
+    command: ["redis-server", "--bind", "redis", "--port", "6379"]
+    volumes:
+      - "${REDIS_DATA}:/data"
+    ports:
+      - "6379:6379"
+    networks:
+      - webstack
+    restart: always
+
+networks:
+  webstack:
+    driver: bridge
