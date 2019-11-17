@@ -17,7 +17,6 @@ services:
   node:
     container_name: node
     image: "node:${NODE_TAG}"
-    user: node
     working_dir: /data
     environment:
       - "NODE_ENV=${NODE_ENV}"
